@@ -12,8 +12,43 @@
 					<h5>{{ venue.name }}</h5>
 				</div>
 			</a>
+			<form id="deleteForm-{{ venue.id }}" action="/venues/{{ venue.id }}" method="POST">
+				<input type="hidden" name="_method" value="DELETE">
+				<button type="button" class="delete-button" data-venue-id="{{ venue.id }}">
+					Delete Venue
+				</button>
+			</form>
 		</li>
 		{% endfor %}
 	</ul>
 {% endfor %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const deleteBtns = document.querySelectorAll('.delete-button');
+        deleteBtns.forEach(btn => {
+            btn.addEventListener('click', function(e) {
+                const venueId = e.target.dataset.venueId;
+                
+                fetch(`/venues/${venueId}`, {
+                    method: 'DELETE'
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('something wrong happen');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    const form = document.querySelector(`#deleteForm-${venueId}`);
+                    if (form) {
+                        form.parentElement.remove();
+                    }
+                    alert('Venue successfully deleted');
+                })
+            });
+        });
+    });
+</script>
+
+
 {% endblock %}
